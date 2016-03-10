@@ -33,9 +33,10 @@ $.ddMM.mm_ddMultipleFields = {
 		maxRow: 0,
 		//Различные опции
 		options: {
-			sortable:true,
-			showIndex:true,
-			btnToggleRaw:false
+			sortable: true,
+			showIndex: true,
+			btnToggleRaw: false,
+			size: ''
 		}
 	},
 //	Все экземпляры (TV). Структура: {
@@ -370,7 +371,7 @@ $.ddMM.mm_ddMultipleFields = {
 				break;
 			//Если мультиселект
 				case 'multiselect':
-				_this.makeSelect(val[key], _cTitle, _inst.coloumnsData[key], _inst.colWidth[key], $col,true);
+				_this.makeSelect(val[key], _cTitle, _inst.coloumnsData[key], _inst.colWidth[key], $col, _inst.options.size?_inst.options.size:true);
 				break;
 			//Если дата
 				case 'date':
@@ -601,7 +602,7 @@ $.ddMM.mm_ddMultipleFields = {
 	},
 	//Функция создания списка
 	makeSelect: function(value, title, data, width, $fieldCol, $multiple){
-		var $select = $('<select class="ddField" style="' + this._united(width,"width: %s") + '"' + ($multiple?' multiple size="" ':'') + '>');
+		var $select = $('<select class="ddField" style="' + this._united(width,"width: %s") + '"' + ($multiple?' multiple size="'+($multiple!==true?$multiple:"")+'" ':'') + '>');
 		
 		if (data){
 			var dataMas = $.parseJSON(data),
