@@ -36,8 +36,8 @@ $.ddMM.mm_ddMultipleFields = {
 			sortable: true,
 			showIndex: true,
 			btnToggleRaw: false,
-			size: ''
-		}
+			hideCommonControl: false,
+			size: ''		}
 	},
 //	Все экземпляры (TV). Структура: {
 //		'id': {
@@ -145,22 +145,22 @@ $.ddMM.mm_ddMultipleFields = {
 			$ddMultipleFieldControl = $('<div class="ddMultipleField Control" id="' + id + 'ddMultipleFieldControl"></div>').appendTo(target),
 			//Делаем таблицу мульти-полей, вешаем на таблицу функцию обновления оригинального поля
 			$ddMultipleField = $('<table class="ddMultipleField" id="' + id + 'ddMultipleField"><tbody></tbody></table>').appendTo(target)/*.on('change.ddEvents', function(){_this.updateTv(id);})*/;
-
+		if (_inst.options.hideCommonControl) $ddMultipleFieldControl.hide();
 		if (!(_inst.maxRow == 1 && _inst.minRow == 1)) {
 		//Кнопка очистки
-			$('<input type="button" value="×" title="' + $.ddMM.lang.confirm_delete_record + '" class="ddDeleteButton" />').appendTo($ddMultipleFieldControl).on("click", function (e) {
+			$('<input type="button" value="×" title="' + $.ddMM.lang.clean + '" class="ddDeleteButton" />').appendTo($ddMultipleFieldControl).on("click", function (e) {
 				e.preventDefault();
-				$(".ddDeleteButton"+(_inst.minRow?":gt("+(_inst.minRow-1)+")":""), $ddMultipleField).click();
+				if(confirm($.ddMM.lang.confirm_delete_record))$(".ddDeleteButton"+(_inst.minRow?":gt("+(_inst.minRow-1)+")":""), $ddMultipleField).click();
 			});
 		}
 		//Кнопка Reset
-		$('<input type="button" value="&#9100;" title="Reset"/>').appendTo($ddMultipleFieldControl).on("click", function (e) {
+		$('<input type="button" value="&#9100;" title="' + $.ddMM.lang.reset + '"/>').appendTo($ddMultipleFieldControl).on("click", function (e) {
 			e.preventDefault();
 			_this._reset(id);
 		});
 		// Кнопка "Показать/скрыть исходное значение". Простая возможность скопировать и вставить значение всего поля.
 		if (_inst.options.btnToggleRaw) {
-			$('<input type="button" value="Raw" title="Показать/Скрыть оригинальное поле. Доступны стандартные копирование и вставка. После вставки, нажмите кнопку сброса. Внимание! Неправильный формат исходного поля может привести к непредсказуемым последствиям!"/>').appendTo($ddMultipleFieldControl).on("click", function (e) {
+			$('<input type="button" value="Raw" title="' + $.ddMM.lang.raw_btn_tip + '"/>').appendTo($ddMultipleFieldControl).on("click", function (e) {
 				e.preventDefault();
 				$('#' + id).toggle();
 			});
@@ -253,7 +253,7 @@ $.ddMM.mm_ddMultipleFields = {
 		  var h = screen.height * 0.5;
 		  OpenServerBrowser('media/browser/mcpuk/browse.php?opener=ddMultipleField&type='+type, w, h);
 		 };
-			$("<input type='button' title='' value='Пакетное заполнение' />").appendTo($ddMultipleFieldControl).click(function(e){
+			$("<input type='button' title='' value='"+$.ddMM.lang.batch_filling+"' />").appendTo($ddMultipleFieldControl).click(function(e){
 				e.preventDefault();
 				window.KCFinder = {
 					callBackMultiple: function (files) {
@@ -340,7 +340,7 @@ $.ddMM.mm_ddMultipleFields = {
 				_this.makeImage(id, $col);
 				
 				//Create Attach browse button
-				$('<input class="ddAttachButton" type="button" value="Вставить" />').insertAfter($field).on('click', function(){
+				$('<input class="ddAttachButton" type="button" value="' + $.ddMM.lang.insert + '" />').insertAfter($field).on('click', function(){
 					_inst.currentField = $(this).siblings('.ddField');
 					BrowseServer(id);
 				});
@@ -350,7 +350,7 @@ $.ddMM.mm_ddMultipleFields = {
 				$field = _this.makeText(val[key], _cTitle, _inst.colWidth[key], $col);
 				
 				//Create Attach browse button
-				$('<input class="ddAttachButton" type="button" value="Вставить" />').insertAfter($field).on('click', function(){
+				$('<input class="ddAttachButton" type="button" value="' + $.ddMM.lang.insert + '" />').insertAfter($field).on('click', function(){
 					_inst.currentField = $(this).siblings('.ddField');
 					BrowseFileServer(id);
 				});	
@@ -406,7 +406,7 @@ $.ddMM.mm_ddMultipleFields = {
 		//Специально для полей, содержащих изображения необходимо инициализировать
 		$('.ddFieldCol:has(.ddField_image) .ddField', $fieldBlock).trigger('change.ddEvents');
 		
-		if (!returnOnly) $fieldBlock.appendTo($("tbody",_ddField));
+		if (!returnOnly) $fieldBlock.appendTo($(">tbody",_ddField));
 		_this.numberingRows(id);
 		return $fieldBlock;
 	},
@@ -415,7 +415,7 @@ $.ddMM.mm_ddMultipleFields = {
 		var _inst = this.instances[id];
 		if (_inst.options && _inst.options.showIndex===false) return;
 		var _ddField = $('#' + id + 'ddMultipleField');
-		$("tbody tr",_ddField).each(function(){
+		$(">tbody tr",_ddField).each(function(){
 			var t=$(this);
 			t.find("td:first *:not(:has(*))").html(t.index()+1);
 		})
@@ -482,13 +482,13 @@ $.ddMM.mm_ddMultipleFields = {
 			//Вешаем на кнопку создание дубликата текущей строки
 		var _this = this;
 		var fieldBlocks = $('#' + id + 'ddMultipleField .ddFieldBlock');
-		var fieldBlocksLen = fieldBlocks.size();
+		var fieldBlocksLen = fieldBlocks.length;
 		var _inst = _this.instances[id];
 		return $('<input/>').attr({
 			"class": "ddCloneButton",
 			"type": "button",
 			"value": "©",
-			"title": "Copy row",
+			"title": $.ddMM.lang.clone_row,
 			"disabled": (_inst.maxRow && fieldBlocksLen + 1 == _inst.maxRow) ? "disabled" : false
 		}).on('click', function () {
 			if ($(this).attr("disabled")) return false;
@@ -551,10 +551,10 @@ $.ddMM.mm_ddMultipleFields = {
 		
 		$('<div class="ddFieldCol_edit"><a class="false" href="#">' + $.ddMM.lang.edit + '</a></div>').appendTo($fieldCol).find('a').on('click', function(event){
 			_this.richtextWindow = window.open($.ddMM.config.site_url + $.ddMM.urls.mm + 'widgets/ddmultiplefields/richtext/index.php', 'mm_ddMultipleFields_richtext', new Array(
-				'width=600',
-				'height=550',
-				'left=' + (($.ddTools.windowWidth - 600) / 2),
-				'top=' + (($.ddTools.windowHeight - 550) / 2),
+				'width=900',
+				'height=560',
+				'left=' + (($.ddTools.windowWidth - 900) / 2),
+				'top=' + (($.ddTools.windowHeight - 560) / 2),
 				'menubar=no',
 				'toolbar=no',
 				'location=no',
